@@ -104,7 +104,7 @@ app.post('/signup', function(req, res) {
       });
 
       user.save().then(function() {
-        res.send(200, 'User created');
+        res.redirect('/');
       });
     }
   });
