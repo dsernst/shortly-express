@@ -105,15 +105,11 @@ app.post('/signup', function(req, res) {
     if (found) {
       res.send(200, "username taken");
     } else {
-      new User({username: username})
-      .makeHash(password)
-      .save()
-      .then(function() {
-        var session = new Session({username: username});
-        session.save().then(function() {
-          res.cookie('session', session.get('session_key'));
-          res.redirect('/');
-        });
+      new User({username: username}).makeHash(password);
+      var session = new Session({username: username});
+      session.save().then(function() {
+        res.cookie('session', session.get('session_key'));
+        res.redirect('/');
       });
     }
   });
