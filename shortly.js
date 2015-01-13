@@ -136,7 +136,13 @@ app.post('/login', function(req, res) {
   });
 });
 
-
+app.delete('/session', checkUser, function(req, res) {
+  new Session({session_key: req.cookies.session}).fetch().then(function (found) {
+    found.destroy()
+  });
+  res.cookie('session', '');
+  res.redirect('/');
+});
 
 
 /************************************************************/
