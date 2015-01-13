@@ -25,13 +25,27 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 app.use(cookieParser());
 
-
-app.get('/', function(req, res) {
-  if (checkUser(req)){
-    res.render('index');
-  } else {
-    res.redirect('/login');
+var checkUser = function(req, res, next) {
+  if (req.url === "/login" || req.url === "/signup") {
+    next();
   }
+  var cookieSession = req.cookies.session;
+  if (cookieSession) {
+    new Session({session_key: cookieSession}).fetch().then(function(found) {
+      if (found) {
+        next();
+      } else {
+        res.redirect('login');
+      }
+    });
+  } else {
+    res.redirect('login');
+  }
+};
+
+app.use(checkUser);
+app.get('/', function(req, res) {
+  res.render('index');
 });
 
 app.get('/login', function(req, res) {
@@ -43,21 +57,13 @@ app.get('/signup', function(req, res) {
 })
 
 app.get('/create', function(req, res) {
-  if (checkUser(req)){
-    res.render('index');
-  } else {
-    res.redirect('/login');
-  }
+  res.render('index');
 });
 
 app.get('/links', function(req, res) {
-  if (checkUser(req)){
-    Links.reset().fetch().then(function(links) {
-      res.send(200, links.models);
-    });
-  } else {
-    res.redirect('/login');
-  }
+  Links.reset().fetch().then(function(links) {
+    res.send(200, links.models);
+  });
 });
 
 app.post('/links', function(req, res) {
@@ -130,23 +136,7 @@ app.post('/login', function(req, res) {
   });
 });
 
-/************************************************************/
-// Write your authentication routes here
-/************************************************************/
 
-var checkUser = function(req) {
-  var cookieSession = req.cookies.session;
-  if (cookieSession) {
-    var check = new Session({session_key: cookieSession})
-    debugger;
-    check.fetch().then(function(found) {
-      if (found) {
-        return true;
-      }
-    });
-  }
-  return false;
-};
 
 
 /************************************************************/
