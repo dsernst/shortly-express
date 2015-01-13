@@ -2,6 +2,7 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 
 
 var db = require('./app/config');
@@ -10,6 +11,7 @@ var User = require('./app/models/user');
 var Links = require('./app/collections/links');
 var Link = require('./app/models/link');
 var Click = require('./app/models/click');
+var Session = require('./app/models/session');
 
 var app = express();
 
@@ -21,10 +23,11 @@ app.use(bodyParser.json());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+app.use(cookieParser());
 
 
 app.get('/', function(req, res) {
-  if (checkUser()){
+  if (checkUser(req)){
     res.render('index');
   } else {
     res.redirect('/login');
@@ -40,7 +43,7 @@ app.get('/signup', function(req, res) {
 })
 
 app.get('/create', function(req, res) {
-  if (checkUser()){
+  if (checkUser(req)){
     res.render('index');
   } else {
     res.redirect('/login');
@@ -48,7 +51,7 @@ app.get('/create', function(req, res) {
 });
 
 app.get('/links', function(req, res) {
-  if (checkUser()){
+  if (checkUser(req)){
     Links.reset().fetch().then(function(links) {
       res.send(200, links.models);
     });
@@ -116,7 +119,11 @@ app.post('/login', function(req, res) {
 
   new User({ username: username, password: password }).fetch().then(function(found) {
     if (found) {
-      res.redirect('/');
+      var session = new Session({username: username});
+      session.save().then(function() {
+        res.cookie('session', session.get('session_key'));
+        res.redirect('/');
+      })
     } else {
       res.redirect('/login');
     }
@@ -127,9 +134,18 @@ app.post('/login', function(req, res) {
 // Write your authentication routes here
 /************************************************************/
 
-var checkUser = function() {
+var checkUser = function(req) {
+  var cookieSession = req.cookies.session;
+  if (cookieSession) {
+    var check = new Session({session_key: cookieSession})
+    debugger;
+    check.fetch().then(function(found) {
+      if (found) {
+        return true;
+      }
+    });
+  }
   return false;
-  // return true;
 };
 
 
