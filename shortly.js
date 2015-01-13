@@ -23,25 +23,41 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
 
-app.get('/', 
-function(req, res) {
-  res.render('index');
+app.get('/', function(req, res) {
+  if (checkUser()){
+    res.render('index');
+  } else {
+    res.redirect('/login');
+  }
 });
 
-app.get('/create', 
-function(req, res) {
-  res.render('index');
+app.get('/login', function(req, res) {
+  res.render('login');
 });
 
-app.get('/links', 
-function(req, res) {
-  Links.reset().fetch().then(function(links) {
-    res.send(200, links.models);
-  });
+app.get('/signup', function(req, res) {
+  res.render('signup')
+})
+
+app.get('/create', function(req, res) {
+  if (checkUser()){
+    res.render('index');
+  } else {
+    res.redirect('/login');
+  }
 });
 
-app.post('/links', 
-function(req, res) {
+app.get('/links', function(req, res) {
+  if (checkUser()){
+    Links.reset().fetch().then(function(links) {
+      res.send(200, links.models);
+    });
+  } else {
+    res.redirect('/login');
+  }
+});
+
+app.post('/links', function(req, res) {
   var uri = req.body.url;
 
   if (!util.isValidUrl(uri)) {
@@ -74,10 +90,15 @@ function(req, res) {
   });
 });
 
+
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
 
+var checkUser = function() {
+  return false;
+  // return true;
+};
 
 
 /************************************************************/
