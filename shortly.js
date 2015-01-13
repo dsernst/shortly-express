@@ -103,7 +103,7 @@ app.post('/signup', function(req, res) {
 
   new User({ username: username }).fetch().then(function(found) {
     if (found) {
-      res.send(200, found.attributes);
+      res.send(200, "username taken");
     } else {
       new User({username: username})
       .makeHash(password)
