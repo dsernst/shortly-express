@@ -90,6 +90,25 @@ app.post('/links', function(req, res) {
   });
 });
 
+app.post('/signup', function(req, res) {
+  var username = req.body.username;
+  var password = req.body.password;
+
+  new User({ username: username }).fetch().then(function(found) {
+    if (found) {
+      res.send(200, found.attributes);
+    } else {
+      var user = new User({
+        username: username,
+        password: password
+      });
+
+      user.save().then(function() {
+        res.send(200, 'User created');
+      });
+    }
+  });
+});
 
 /************************************************************/
 // Write your authentication routes here
