@@ -119,15 +119,19 @@ app.post('/login', function(req, res) {
   var username = req.body.username;
   var password = req.body.password;
 
-  new User({ username: username, password: password }).fetch().then(function(found) {
+  new User({ username: username }).fetch().then(function(found) {
     if (found) {
-      var session = new Session({username: username});
-      session.save().then(function() {
-        res.cookie('session', session.get('session_key'));
-        res.redirect('/');
-      })
+      if (found.checkHash(password)) {
+        var session = new Session({username: username});
+        session.save().then(function() {
+          res.cookie('session', session.get('session_key'));
+          res.redirect('/');
+        })
+      } else {
+        res.redirect('/login');
+      }
     } else {
-      res.redirect('/login');
+      res.redirect('/signup');
     }
   });
 });
