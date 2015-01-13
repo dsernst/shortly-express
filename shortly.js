@@ -141,7 +141,7 @@ app.delete('/session', checkUser, function(req, res) {
     found.destroy()
   });
   res.cookie('session', '');
-  res.redirect('/');
+  res.end();
 });
 
 
