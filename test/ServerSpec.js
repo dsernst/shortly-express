@@ -24,7 +24,7 @@ describe('', function() {
     request('http://127.0.0.1:4568/logout', function(error, res, body) {});
 
     // delete link for roflzoo from db so it can be created later for the test
-    db.knex('urls')
+    db.knex('links')
       .where('url', '=', 'http://www.roflzoo.com/')
       .del()
       .catch(function(error) {
@@ -121,7 +121,7 @@ describe('', function() {
 
       it('New links create a database entry', function(done) {
         requestWithSession(options, function(error, res, body) {
-          db.knex('urls')
+          db.knex('links')
             .where('url', '=', 'http://www.roflzoo.com/')
             .then(function(urls) {
               if (urls['0'] && urls['0']['url']) {
@@ -135,7 +135,7 @@ describe('', function() {
 
       it('Fetches the link url title', function (done) {
         requestWithSession(options, function(error, res, body) {
-          db.knex('urls')
+          db.knex('links')
             .where('title', '=', 'Funny animal pictures, funny animals, funniest dogs')
             .then(function(urls) {
               if (urls['0'] && urls['0']['title']) {

@@ -13,9 +13,9 @@ var db = Bookshelf.initialize({
   }
 });
 
-db.knex.schema.hasTable('urls').then(function(exists) {
+db.knex.schema.hasTable('links').then(function(exists) {
   if (!exists) {
-    db.knex.schema.createTable('urls', function (link) {
+    db.knex.schema.createTable('links', function (link) {
       link.increments('id').primary();
       link.string('url', 255);
       link.string('base_url', 255);
