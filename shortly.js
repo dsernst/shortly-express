@@ -105,12 +105,10 @@ app.post('/signup', function(req, res) {
     if (found) {
       res.send(200, found.attributes);
     } else {
-      var user = new User({
-        username: username,
-        password: password
-      });
-
-      user.save().then(function() {
+      new User({username: username})
+      .makeHash(password)
+      .save()
+      .then(function() {
         res.redirect('/');
       });
     }
