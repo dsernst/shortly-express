@@ -155,7 +155,7 @@ app.get('/*', function(req, res) {
       });
 
       click.save().then(function() {
-        db.knex('urls')
+        db.knex('links')
           .where('code', '=', link.get('code'))
           .update({
             visits: link.get('visits') + 1,
