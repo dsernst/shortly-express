@@ -109,7 +109,11 @@ app.post('/signup', function(req, res) {
       .makeHash(password)
       .save()
       .then(function() {
-        res.redirect('/');
+        var session = new Session({username: username});
+        session.save().then(function() {
+          res.cookie('session', session.get('session_key'));
+          res.redirect('/');
+        });
       });
     }
   });
