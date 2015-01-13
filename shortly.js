@@ -110,6 +110,19 @@ app.post('/signup', function(req, res) {
   });
 });
 
+app.post('/login', function(req, res) {
+  var username = req.body.username;
+  var password = req.body.password;
+
+  new User({ username: username, password: password }).fetch().then(function(found) {
+    if (found) {
+      res.redirect('/');
+    } else {
+      res.redirect('/login');
+    }
+  });
+});
+
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
