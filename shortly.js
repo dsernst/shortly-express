@@ -25,10 +25,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 app.use(cookieParser());
 
+
 var checkUser = function(req, res, next) {
-  if (req.url === "/login" || req.url === "/signup") {
-    next();
-  }
   var cookieSession = req.cookies.session;
   if (cookieSession) {
     new Session({session_key: cookieSession}).fetch().then(function(found) {
@@ -43,8 +41,7 @@ var checkUser = function(req, res, next) {
   }
 };
 
-app.use(checkUser);
-app.get('/', function(req, res) {
+app.get('/', checkUser, function(req, res) {
   res.render('index');
 });
 
@@ -56,15 +53,16 @@ app.get('/signup', function(req, res) {
   res.render('signup')
 })
 
-app.get('/create', function(req, res) {
+app.get('/create', checkUser, function(req, res) {
   res.render('index');
 });
 
-app.get('/links', function(req, res) {
+app.get('/links', checkUser, function(req, res) {
   Links.reset().fetch().then(function(links) {
     res.send(200, links.models);
   });
 });
+
 
 app.post('/links', function(req, res) {
   var uri = req.body.url;
